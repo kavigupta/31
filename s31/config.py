@@ -4,9 +4,14 @@ import uuid
 import json
 
 from .mail import get_mail_program
+from .screen import get_screen_program
 
 CONFIG_LOC = os.path.expanduser("~/.31rc")
-DEFAULT_CONFIG = dict(log_location=os.path.expanduser("~/.log"), mail_program="detect")
+DEFAULT_CONFIG = dict(
+    log_location=os.path.expanduser("~/.log"),
+    mail_program="detect",
+    screen_program="screen",
+)
 
 
 class Config:
@@ -16,6 +21,7 @@ class Config:
         self._config = dict(DEFAULT_CONFIG)
         self._config.update(config)
         self._mail_program = get_mail_program(self._config["mail_program"])
+        self._screen_program = get_screen_program(self._config["screen_program"])
         if "email" not in self._config:
             raise RuntimeError(
                 "You need to provide an email address, please run `31 --config email youraddress@example.com` to set this up"
@@ -32,6 +38,9 @@ class Config:
 
     def send_mail(self, subject, body):
         return self._mail_program(to=self._email, subject=subject, body=body)
+
+    def launch_screen(self, command, name):
+        return self._screen_program(command=command, name=name)
 
 
 def _load_config():
