@@ -20,6 +20,7 @@ def main():
     except RuntimeError as e:
         print(e, file=sys.stderr)
 
+
 def run_command(args):
     if (args.command is not None) == (args.config is not None):
         raise RuntimeError(
