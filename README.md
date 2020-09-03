@@ -9,7 +9,7 @@ For example
 31 -c 'sleep 100; echo 2'
 ```
 
-runs the command `sleep 100; echo 2` then sends you an email with the output of the command once it is complete.
+runs the command `sleep 100; echo 2` in a screen session then sends you an email with the output of the command once it is complete.
 
 ## Setup
 

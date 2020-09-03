@@ -12,5 +12,4 @@ def get_screen_program(name):
 def _screen(command, name):
     name = re.sub(r"[^A-Za-z0-9-., ]", "?", name)
     screen_command = ["screen", "-S", name, "-d", "-m", "--", *command]
-    print(screen_command)
     subprocess.check_call(screen_command)
