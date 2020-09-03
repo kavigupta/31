@@ -6,9 +6,7 @@ import json
 from .mail import get_mail_program
 
 CONFIG_LOC = os.path.expanduser("~/.31rc")
-DEFAULT_CONFIG = dict(
-    log_location=os.path.expanduser("~/.log"), mail_program="gnu_mail"
-)
+DEFAULT_CONFIG = dict(log_location=os.path.expanduser("~/.log"), mail_program="detect")
 
 
 class Config:
