@@ -24,7 +24,7 @@ class Config:
         self._screen_program = get_screen_program(self._config["screen_program"])
         if "email" not in self._config:
             raise RuntimeError(
-                "You need to provide an email address, please run `31 --config email youraddress@example.com` to set this up"
+                "You need to provide an email address, please run `31 config email youraddress@example.com` to set this up"
             )
         self._email = self._config["email"]
 
