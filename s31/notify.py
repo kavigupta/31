@@ -1,8 +1,5 @@
 from datetime import datetime
 from display_timedelta import display_timedelta
-import sys
-
-from . import utils
 
 FORMAT = "%Y.%m.%d.%H.%M.%S.%f"
 
@@ -12,8 +9,7 @@ def notify(config, command):
     path = datetime.strftime(start, FORMAT)
     logfile = config.create_log_file(path)
 
-    with open(logfile, "wb") as f:
-        exitcode = utils.run_with_tee(command, (f, sys.stdout.buffer))
+    exitcode = command.run_teed(logfile)
 
     end = datetime.now()
 
@@ -24,8 +20,8 @@ def notify(config, command):
     subject = "{} in {}: {}".format(
         "Process succeeded"
         if exitcode == 0
-        else "Process failed with {}".format(exitcode),
+        else "Process failed with code {}".format(exitcode),
         display_timedelta(delta),
-        command,
+        command.cmd_line,
     )
     config.send_mail(subject, log_contents)

@@ -3,6 +3,7 @@ import sys
 
 from .config import Config, update_config
 from .notify import notify
+from .command import Command
 
 
 def main():
@@ -39,7 +40,7 @@ def main():
 def command_action(args):
     config = Config()
     if args.sync:
-        notify(config, args.command)
+        notify(config, Command(args.command))
     else:
         config.launch_screen(sys.argv + ["--sync"], args.screen_name or args.command)
 
