@@ -17,7 +17,7 @@ def main():
         "-s",
         "--sync",
         action="store_true",
-        help="Run the command synchronously, that is not in a screen session",
+        help="Run the command synchronously, that is, not in a screen session",
     )
     command_parser.add_argument(
         "-n", "--screen-name", help="The name of the screen session to create"
