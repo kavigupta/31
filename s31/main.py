@@ -22,6 +22,9 @@ def main():
     command_parser.add_argument(
         "-n", "--screen-name", help="The name of the screen session to create"
     )
+    command_parser.add_argument(
+        "-l", "--location", help="The location to run the script"
+    )
     command_parser.add_argument("command", help="Command to run")
     command_parser.set_defaults(action=command_action)
 
@@ -40,7 +43,7 @@ def main():
 def command_action(args):
     config = Config()
     if args.sync:
-        notify(config, Command(args.command))
+        notify(config, Command(cmd_line=args.command, location=args.location))
     else:
         config.launch_screen(sys.argv + ["--sync"], args.screen_name or args.command)
 
