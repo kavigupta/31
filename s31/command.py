@@ -23,4 +23,10 @@ class Command:
                 line = p.stdout.readline()
                 if line:
                     write(line)
+            while True:
+                line = p.stdout.readline()
+                if line:
+                    write(line)
+                else:
+                    break
             return p.returncode
