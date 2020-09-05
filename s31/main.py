@@ -9,7 +9,12 @@ from .command import Command
 
 def main():
     def config_argument(p):
-        p.add_argument("--config-file", default=os.path.expanduser("~/.31rc"), help="The location of the configuration file")
+        p.add_argument(
+            "--config-file",
+            default=os.path.expanduser("~/.31rc"),
+            help="The location of the configuration file",
+        )
+
     parser = argparse.ArgumentParser("31")
     subparsers = parser.add_subparsers(dest="cmd", required=True)
 
