@@ -15,13 +15,10 @@ class Command:
                 f.write(x)
                 sys.stdout.buffer.write(x)
 
-
             kwargs = dict(shell=1, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             if self.location is not None:
-                kwargs['cwd'] = self.location
-            p = subprocess.Popen(
-                self.cmd_line, **kwargs
-            )
+                kwargs["cwd"] = self.location
+            p = subprocess.Popen(self.cmd_line, **kwargs)
             while p.poll() is None:
                 line = p.stdout.readline()
                 if line:

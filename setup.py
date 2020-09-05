@@ -13,7 +13,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/kavigupta/31",
     packages=setuptools.find_packages(),
-    entry_points={"console_scripts": ["31=s31.main:main"],},
+    entry_points={
+        "console_scripts": ["31=s31.main:main"],
+    },
     classifiers=[
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
