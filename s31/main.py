@@ -1,5 +1,6 @@
 import argparse
 import sys
+import os
 
 from .config import Config, update_config
 from .notify import notify
@@ -7,12 +8,15 @@ from .command import Command
 
 
 def main():
+    def config_argument(p):
+        p.add_argument("--config-file", default=os.path.expanduser("~/.31rc"), help="The location of the configuration file")
     parser = argparse.ArgumentParser("31")
-    subparsers = parser.add_subparsers(required=True, dest="cmd")
+    subparsers = parser.add_subparsers(dest="cmd", required=True)
 
     command_parser = subparsers.add_parser(
         "command", help="Run a command", aliases=["c"]
     )
+    config_argument(command_parser)
     command_parser.add_argument(
         "-s",
         "--sync",
@@ -29,6 +33,7 @@ def main():
     command_parser.set_defaults(action=command_action)
 
     config_parser = subparsers.add_parser("config", help="Modify configuration")
+    config_argument(config_parser)
     config_parser.add_argument("key", help="The configuration key to modify")
     config_parser.add_argument("value", help="The value to assign the given key to")
     config_parser.set_defaults(action=config_action)
@@ -41,7 +46,7 @@ def main():
 
 
 def command_action(args):
-    config = Config()
+    config = Config(args.config_file)
     if args.sync:
         notify(config, Command(cmd_line=args.command, location=args.location))
     else:
@@ -49,4 +54,4 @@ def command_action(args):
 
 
 def config_action(args):
-    update_config({args.key: args.value})
+    update_config(args.config_file, {args.key: args.value})

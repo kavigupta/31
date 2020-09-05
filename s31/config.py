@@ -6,7 +6,6 @@ import json
 from .mail import get_mail_program
 from .screen import get_screen_program
 
-CONFIG_LOC = os.path.expanduser("~/.31rc")
 DEFAULT_CONFIG = dict(
     log_location=os.path.expanduser("~/.log"),
     mail_program="detect",
@@ -15,9 +14,8 @@ DEFAULT_CONFIG = dict(
 
 
 class Config:
-    def __init__(self, config=None):
-        if config is None:
-            config = _load_config()
+    def __init__(self, config_file):
+        config = _load_config(config_file)
         self._config = dict(DEFAULT_CONFIG)
         self._config.update(config)
         self._mail_program = get_mail_program(self._config["mail_program"])
@@ -43,16 +41,16 @@ class Config:
         return self._screen_program(command=command, name=name)
 
 
-def _load_config():
+def _load_config(config_file):
     try:
-        with open(CONFIG_LOC) as f:
+        with open(config_file) as f:
             return json.load(f)
     except FileNotFoundError:
         return {}
 
 
-def update_config(new_config):
-    config = _load_config()
+def update_config(config_file, new_config):
+    config = _load_config(config_file)
     config.update(new_config)
-    with open(CONFIG_LOC, "w") as f:
+    with open(config_file, "w") as f:
         json.dump(config, f)
