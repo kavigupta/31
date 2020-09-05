@@ -13,7 +13,7 @@ def get_mail_program(program_name):
             raise RuntimeError(
                 "Could not detect a mail program. Please see the documentation for a list of supported programs."
             )
-    return dict(gnu_mail=_gnu_mail, mutt=_mutt)[program_name]
+    return dict(gnu_mail=_gnu_mail, mutt=_mutt, test=_test)[program_name]
 
 
 def _gnu_mail(to, subject, body):
@@ -22,3 +22,10 @@ def _gnu_mail(to, subject, body):
 
 def _mutt(to, subject, body):
     subprocess.run(["mutt", "-s", subject, to], input=body)
+
+
+def _test(to, subject, body):
+    print("SENDING EMAIL")
+    print(repr(to))
+    print(repr(subject))
+    print(repr(body))
