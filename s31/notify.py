@@ -21,7 +21,7 @@ def notify(config, command):
         "Process succeeded"
         if exitcode == 0
         else "Process failed with code {}".format(exitcode),
-        display_timedelta(delta),
+        display_timedelta(delta).replace("right now", "0 seconds"),
         command.cmd_line,
     )
     config.send_mail(subject, log_contents)
