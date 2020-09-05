@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 from .utils import output_matches
 
@@ -26,6 +27,7 @@ def _mutt(to, subject, body):
 
 def _test(to, subject, body):
     print("SENDING EMAIL")
-    print(repr(to))
-    print(repr(subject))
-    print(repr(body))
+    print("TO =", repr(to))
+    print("SUBJECT =", repr(subject))
+    print("BODY =", repr(body.decode("utf-8")))
+    sys.stdout.flush()

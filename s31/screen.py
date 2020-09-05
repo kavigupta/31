@@ -1,3 +1,4 @@
+import sys
 import subprocess
 import re
 
@@ -19,6 +20,9 @@ def _screen(command, name):
 
 def _test(command, name):
     print("BEGIN SCREEN")
-    print(repr(name))
+    print("COMMAND =", repr(name))
+    sys.stdout.flush()
     subprocess.run(command)
+    sys.stdout.flush()
     print("END SCREEN")
+    sys.stdout.flush()
