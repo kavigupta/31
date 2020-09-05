@@ -16,7 +16,8 @@ def main():
         )
 
     parser = argparse.ArgumentParser("31")
-    subparsers = parser.add_subparsers(dest="cmd", required=True)
+    subparsers = parser.add_subparsers(dest="cmd")
+    subparsers.required = True
 
     command_parser = subparsers.add_parser(
         "command", help="Run a command", aliases=["c"]
