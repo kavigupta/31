@@ -1,6 +1,5 @@
-import attr
 import os
-import uuid
+import re
 import json
 
 from .mail import get_mail_program
@@ -38,7 +37,10 @@ class Config:
         return self._mail_program(to=self._email, subject=subject, body=body)
 
     def launch_screen(self, command, name):
-        return self._screen_program(command=command, name=name)
+        return self._screen_program(command=command, name=self._sanitize(name))
+
+    def _sanitize(self, name):
+        return re.sub("[^A-Za-z0-9_.]+", "_", name).strip("_")
 
 
 def _load_config(config_file):

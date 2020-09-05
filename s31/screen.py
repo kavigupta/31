@@ -20,7 +20,7 @@ def _screen(command, name):
 
 def _test(command, name):
     print("BEGIN SCREEN")
-    print("COMMAND =", repr(name))
+    print("NAME =", repr(name))
     sys.stdout.flush()
     subprocess.run(command)
     sys.stdout.flush()
