@@ -2,7 +2,7 @@ from .test31 import Test31
 import os
 
 
-class TestSync(Test31):
+class TestOptions(Test31):
     def test_sync(self):
         self.assertOutput(
             ["31", "c", "--sync", "echo test"],
@@ -27,6 +27,18 @@ class TestSync(Test31):
                 "TO = 'test@example.com'",
                 "SUBJECT = 'Process succeeded in 0 seconds: echo test'",
                 "BODY = 'test\\n'",
+                "END SCREEN",
+                "",
+            ],
+        )
+
+    def test_no_emails(self):
+        self.assertOutput(
+            ["31", "c", "--no-email", "echo test"],
+            [
+                "BEGIN SCREEN",
+                "NAME = 'echo_test'",
+                "test",
                 "END SCREEN",
                 "",
             ],

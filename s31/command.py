@@ -15,10 +15,12 @@ class Command:
                 f.write(x)
                 sys.stdout.buffer.write(x)
 
-            kwargs = dict(shell=1, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            if self.location is not None:
-                kwargs["cwd"] = self.location
-            p = subprocess.Popen(self.cmd_line, **kwargs)
+            p = subprocess.Popen(
+                self.cmd_line,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                **self.kwargs
+            )
             while p.poll() is None:
                 line = p.stdout.readline()
                 if line:
@@ -30,3 +32,13 @@ class Command:
                 else:
                     break
             return p.returncode
+
+    @property
+    def kwargs(self):
+        kwargs = dict(shell=1)
+        if self.location is not None:
+            kwargs["cwd"] = self.location
+        return kwargs
+
+    def run(self):
+        subprocess.run(self.cmd_line, **self.kwargs)

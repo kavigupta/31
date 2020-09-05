@@ -35,6 +35,11 @@ def main():
     command_parser.add_argument(
         "-l", "--location", help="The location to run the script"
     )
+    command_parser.add_argument(
+        "--no-email",
+        help="Do not send an email when the command is done running",
+        action="store_true",
+    )
     command_parser.add_argument("command", help="Command to run")
     command_parser.set_defaults(action=command_action)
 
@@ -54,7 +59,11 @@ def main():
 def command_action(args):
     config = Config(args.config_file)
     if args.sync:
-        notify(config, Command(cmd_line=args.command, location=args.location))
+        cmd = Command(cmd_line=args.command, location=args.location)
+        if args.no_email:
+            cmd.run()
+        else:
+            notify(config, cmd)
     else:
         config.launch_screen(sys.argv + ["--sync"], args.screen_name or args.command)
 
