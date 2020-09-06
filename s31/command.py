@@ -49,6 +49,9 @@ class Command:
     def run(self):
         subprocess.run(self.cmd_line, **self.kwargs)
 
+    def dry_run(self):
+        print(self.cmd_line)
+
 
 def _replace(value, assignments):
     if value is None:

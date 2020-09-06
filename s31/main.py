@@ -42,6 +42,11 @@ def main():
         action="store_true",
     )
     command_parser.add_argument(
+        "-d", "--dry-run",
+        help="Print out the commands to be run rather than running them",
+        action="store_true",
+    )
+    command_parser.add_argument(
         "-f",
         "--foreach",
         metavar=("%var", "vals"),
@@ -86,12 +91,14 @@ def main():
 def command_action(args):
     config = Config(args.config_file)
 
-    if args.sync:
+    if args.sync or args.dry_run:
         assignments = parse_foreach_args(args)
         cmd = Command(cmd_line=args.command, location=args.location)
         for assignment in assignments:
             cmd_to_use = cmd.replace(assignment)
-            if args.no_email:
+            if args.dry_run:
+                cmd_to_use.dry_run()
+            elif args.no_email:
                 cmd_to_use.run()
             else:
                 notify(config, cmd_to_use)
