@@ -7,7 +7,7 @@ from .config import Config, update_config
 from .notify import notify
 from .command import Command
 from .foreach import MAX_FOREACHES, parse_foreach_args
-from .utils import format_assignments
+from .utils import format_assignments, sanitize
 
 
 def main():
@@ -103,10 +103,15 @@ def command_action(args):
         else parse_foreach_args(args)
     )
     for assignment in assignments:
+        screen_name = sanitize(
+            format_assignments(args.screen_name or args.command, assignment)
+        )
         if args.sync or args.dry_run:
             cmd = Command(cmd_line=args.command, location=args.location)
             cmd_to_use = cmd.replace(assignment)
             if args.dry_run:
+                if not args.sync:
+                    print("# on screen {}".format(screen_name))
                 cmd_to_use.dry_run()
             elif args.no_email:
                 cmd_to_use.run()
@@ -116,7 +121,7 @@ def command_action(args):
             config.launch_screen(
                 sys.argv
                 + ["--sync", "--foreach-specified-args", json.dumps(assignment)],
-                format_assignments(args.screen_name or args.command, assignment),
+                screen_name,
             )
 
 

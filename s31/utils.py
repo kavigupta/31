@@ -13,3 +13,7 @@ def format_assignments(value, assignments):
     for var, val in assignments:
         value = value.replace(var, val)
     return value
+
+
+def sanitize(name):
+    return re.sub("[^A-Za-z0-9_.]+", "_", name).strip("_")

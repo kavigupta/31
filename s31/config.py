@@ -37,10 +37,7 @@ class Config:
         return self._mail_program(to=self._email, subject=subject, body=body)
 
     def launch_screen(self, command, name):
-        return self._screen_program(command=command, name=self._sanitize(name))
-
-    def _sanitize(self, name):
-        return re.sub("[^A-Za-z0-9_.]+", "_", name).strip("_")
+        return self._screen_program(command=command, name=name)
 
 
 def _load_config(config_file):
