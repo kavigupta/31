@@ -33,6 +33,12 @@ class Command:
                     break
             return p.returncode
 
+    def replace(self, assignments):
+        return Command(
+            cmd_line=_replace(self.cmd_line, assignments),
+            location=_replace(self.location, assignments),
+        )
+
     @property
     def kwargs(self):
         kwargs = dict(shell=1)
@@ -42,3 +48,11 @@ class Command:
 
     def run(self):
         subprocess.run(self.cmd_line, **self.kwargs)
+
+
+def _replace(value, assignments):
+    if value is None:
+        return value
+    for var, val in assignments:
+        value = value.replace(var, val)
+    return value

@@ -5,6 +5,7 @@ import os
 from .config import Config, update_config
 from .notify import notify
 from .command import Command
+from .foreach import MAX_FOREACHES, parse_foreach_args
 
 
 def main():
@@ -40,6 +41,32 @@ def main():
         help="Do not send an email when the command is done running",
         action="store_true",
     )
+    command_parser.add_argument(
+        "-f",
+        "--foreach",
+        metavar=("%var", "vals"),
+        nargs=2,
+        action="append",
+        help="Replaces each occurence of the variable with the corresponding value. "
+        "Variables can be any sequence of characters. "
+        "After the variables, values can be provided, each list of values should be a single argument in CSV format. "
+        "See the documentation for details and examples.",
+    )
+    for k in range(2, 1 + MAX_FOREACHES):
+        meta = tuple("%var{}".format(i) for i in range(1, k + 1))
+        meta += tuple("vals{}".format(i) for i in range(1, k + 1))
+        command_parser.add_argument(
+            "-f" + str(k),
+            "--foreach-" + str(k),
+            metavar=meta,
+            nargs=k * 2,
+            action="append",
+            help="See -f for details, -f2 through -f{0} allow you to zip the values for 2-{0} variables together.".format(
+                MAX_FOREACHES
+            )
+            if k == 2
+            else argparse.SUPPRESS,
+        )
     command_parser.add_argument("command", help="Command to run")
     command_parser.set_defaults(action=command_action)
 
@@ -58,12 +85,16 @@ def main():
 
 def command_action(args):
     config = Config(args.config_file)
+
     if args.sync:
+        assignments = parse_foreach_args(args)
         cmd = Command(cmd_line=args.command, location=args.location)
-        if args.no_email:
-            cmd.run()
-        else:
-            notify(config, cmd)
+        for assignment in assignments:
+            cmd_to_use = cmd.replace(assignment)
+            if args.no_email:
+                cmd_to_use.run()
+            else:
+                notify(config, cmd_to_use)
     else:
         config.launch_screen(sys.argv + ["--sync"], args.screen_name or args.command)
 
