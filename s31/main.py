@@ -1,11 +1,13 @@
 import argparse
 import sys
 import os
+import json
 
 from .config import Config, update_config
 from .notify import notify
 from .command import Command
 from .foreach import MAX_FOREACHES, parse_foreach_args
+from .utils import format_assignments
 
 
 def main():
@@ -42,7 +44,8 @@ def main():
         action="store_true",
     )
     command_parser.add_argument(
-        "-d", "--dry-run",
+        "-d",
+        "--dry-run",
         help="Print out the commands to be run rather than running them",
         action="store_true",
     )
@@ -72,6 +75,10 @@ def main():
             if k == 2
             else argparse.SUPPRESS,
         )
+    # internal use only, specifies which foreach args to use, in json format [(name, value)]
+    command_parser.add_argument(
+        "--foreach-specified-args", type=json.loads, help=argparse.SUPPRESS
+    )
     command_parser.add_argument("command", help="Command to run")
     command_parser.set_defaults(action=command_action)
 
@@ -90,11 +97,14 @@ def main():
 
 def command_action(args):
     config = Config(args.config_file)
-
-    if args.sync or args.dry_run:
-        assignments = parse_foreach_args(args)
-        cmd = Command(cmd_line=args.command, location=args.location)
-        for assignment in assignments:
+    assignments = (
+        [args.foreach_specified_args]
+        if args.foreach_specified_args is not None
+        else parse_foreach_args(args)
+    )
+    for assignment in assignments:
+        if args.sync or args.dry_run:
+            cmd = Command(cmd_line=args.command, location=args.location)
             cmd_to_use = cmd.replace(assignment)
             if args.dry_run:
                 cmd_to_use.dry_run()
@@ -102,8 +112,12 @@ def command_action(args):
                 cmd_to_use.run()
             else:
                 notify(config, cmd_to_use)
-    else:
-        config.launch_screen(sys.argv + ["--sync"], args.screen_name or args.command)
+        else:
+            config.launch_screen(
+                sys.argv
+                + ["--sync", "--foreach-specified-args", json.dumps(assignment)],
+                format_assignments(args.screen_name or args.command, assignment),
+            )
 
 
 def config_action(args):

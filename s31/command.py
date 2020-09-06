@@ -3,6 +3,9 @@ import sys
 import subprocess
 
 
+from .utils import format_assignments
+
+
 @attr.s
 class Command:
     cmd_line = attr.ib()
@@ -35,8 +38,8 @@ class Command:
 
     def replace(self, assignments):
         return Command(
-            cmd_line=_replace(self.cmd_line, assignments),
-            location=_replace(self.location, assignments),
+            cmd_line=format_assignments(self.cmd_line, assignments),
+            location=format_assignments(self.location, assignments),
         )
 
     @property
@@ -51,11 +54,3 @@ class Command:
 
     def dry_run(self):
         print(self.cmd_line)
-
-
-def _replace(value, assignments):
-    if value is None:
-        return value
-    for var, val in assignments:
-        value = value.replace(var, val)
-    return value
