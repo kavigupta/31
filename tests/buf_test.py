@@ -5,8 +5,6 @@ class BasicTest(Test31):
     def test_success(self):
         self.assertOutput(
             [
-                "timeout",
-                "4.5s",
                 "31",
                 "c",
                 "-s",
@@ -22,4 +20,5 @@ class BasicTest(Test31):
                 "",
             ],
             check=0,
+            timeout=4.5,
         )
