@@ -13,8 +13,8 @@ class BasicTest(Test31):
             ],
             [
                 "0",
+                "1",
                 "2",
-                "4",
                 "",
             ],
             check=0,
