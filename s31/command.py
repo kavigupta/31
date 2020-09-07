@@ -17,6 +17,8 @@ class Command:
             def write(x):
                 f.write(x)
                 sys.stdout.buffer.write(x)
+                f.flush()
+                sys.stdout.flush()
 
             p = subprocess.Popen(
                 self.cmd_line,
@@ -44,7 +46,7 @@ class Command:
 
     @property
     def kwargs(self):
-        kwargs = dict(shell=1)
+        kwargs = dict(shell=1, bufsize=0)
         if self.location is not None:
             kwargs["cwd"] = self.location
         return kwargs
