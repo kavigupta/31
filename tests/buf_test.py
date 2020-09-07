@@ -9,16 +9,14 @@ class BasicTest(Test31):
                 "c",
                 "-s",
                 "--no-email",
-                'python -u -c "import time, itertools; [(print(k), time.sleep(1)) for k in itertools.count()]"',
+                'python -u -c "import time, itertools; [(print(k), time.sleep(2)) for k in itertools.count()]"',
             ],
             [
                 "0",
-                "1",
                 "2",
-                "3",
                 "4",
                 "",
             ],
             check=0,
-            timeout=4.5,
+            timeout=5,
         )
