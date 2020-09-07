@@ -9,7 +9,7 @@ class BasicTest(Test31):
                 "c",
                 "-s",
                 "--no-email",
-                'python -c "import time, itertools; [(print(k), time.sleep(1)) for k in itertools.count()]"',
+                'python -u -c "import time, itertools; [(print(k), time.sleep(1)) for k in itertools.count()]"',
             ],
             [
                 "0",
