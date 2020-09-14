@@ -26,4 +26,6 @@ class Test31(unittest.TestCase):
             return f.read().split("\n")
 
     def assertOutput(self, command, output, **kwargs):
-        self.assertEqual(self.get_output(command, **kwargs), output)
+        actual = self.get_output(command, **kwargs)
+        print(actual)
+        self.assertEqual(actual, output)
