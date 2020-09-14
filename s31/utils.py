@@ -1,6 +1,9 @@
 import subprocess
 import re
 
+import shelve
+from filelock import FileLock
+
 
 def output_matches(command, regex):
     output = subprocess.run(
@@ -19,3 +22,15 @@ def format_assignments(value, assignments):
 
 def sanitize(name):
     return re.sub("[^A-Za-z0-9_.]+", "_", name).strip("_")
+
+
+def set_key(file, key):
+    with FileLock(file + ".lock"):
+        with shelve.open(file + ".shelve") as s:
+            s[key] = True
+
+
+def get_keys(file):
+    with FileLock(file + ".lock"):
+        with shelve.open(file + ".shelve") as s:
+            return {k for k in s if s[k]}

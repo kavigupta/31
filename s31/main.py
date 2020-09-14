@@ -6,8 +6,9 @@ import json
 from .config import Config, update_config
 from .notify import notify
 from .command import Command
-from .foreach import MAX_FOREACHES, parse_foreach_args
-from .utils import format_assignments, sanitize
+from .foreach import MAX_FOREACHES, parse_foreach_args, parse_values
+from .utils import format_assignments, sanitize, set_key
+from .workers import dispatch_workers
 
 
 def main():
@@ -60,6 +61,16 @@ def main():
         "After the variables, values can be provided, each list of values should be a single argument in CSV format. "
         "See the documentation for details and examples.",
     )
+    command_parser.add_argument(
+        "-fw",
+        "--foreach-worker",
+        nargs=2,
+        metavar=("%var", "vals"),
+        action="append",
+        help="Similar to -f but associates each substitution with a particular variable. "
+        "Notably, this does not lead to a combinatoric explosion if multiple are used, they are "
+        "implicitly zipped together by the worker index",
+    )
     for k in range(2, 1 + MAX_FOREACHES):
         meta = tuple("%var{}".format(i) for i in range(1, k + 1))
         meta += tuple("vals{}".format(i) for i in range(1, k + 1))
@@ -79,6 +90,23 @@ def main():
     command_parser.add_argument(
         "--foreach-specified-args", type=json.loads, help=argparse.SUPPRESS
     )
+    command_parser.add_argument(
+        "-w",
+        "--max-workers",
+        type=int,
+        help="Limit the number of threads that are to be launched at any point. "
+        "This forces the creation of a monitoring thread, for which --sync is applied to",
+    )
+    command_parser.add_argument(
+        "-wn",
+        "--worker-monitor-name",
+        default="worker-monitor",
+        help="Names the screen for the worker thread. By default is 'worker-monitor'",
+    )
+    # internal use only, specifies that when the process is done, it should set the given key of the given file.
+    command_parser.add_argument(
+        "--when-done-set", nargs=2, metavar=("file", "key"), help=argparse.SUPPRESS
+    )
     command_parser.add_argument("command", help="Command to run")
     command_parser.set_defaults(action=command_action)
 
@@ -96,12 +124,33 @@ def main():
 
 
 def command_action(args):
+    try:
+        return do_command_action(args)
+    finally:
+        if args.when_done_set is not None:
+            set_key(*args.when_done_set)
+
+
+def do_command_action(args):
     config = Config(args.config_file)
     assignments = (
         [args.foreach_specified_args]
         if args.foreach_specified_args is not None
         else parse_foreach_args(args)
     )
+    worker_assignments = []
+    # Validation
+    if args.foreach_worker is not None:
+        for variable, vals in args.foreach_worker:
+            if args.max_workers is None:
+                raise RuntimeError("Cannot provide -fw without -w")
+            vals = parse_values(vals)
+            if len(vals) != args.max_workers:
+                raise RuntimeError(
+                    "Mismatch between number of workers and number of provided values"
+                )
+            worker_assignments.append((variable, vals))
+
     commands = []
     for assignment in assignments:
         screen_name = sanitize(
@@ -119,12 +168,41 @@ def command_action(args):
         return
 
     if not args.sync:
+        if args.max_workers is not None:
+            config.launch_screen(sys.argv + ["--sync"], args.worker_monitor_name)
+            return
         for screen_name, _, assignment in commands:
             config.launch_screen(
                 sys.argv
                 + ["--sync", "--foreach-specified-args", json.dumps(assignment)],
                 screen_name,
             )
+        return
+
+    if args.max_workers is not None and args.foreach_specified_args is None:
+        # if foreach-specified-args is set, this is a dispatch thread
+        def launch_worker(worker_idx, assignment, output_file, token):
+            assignment = assignment + [
+                (var, vals[worker_idx]) for var, vals in worker_assignments
+            ]
+            screen_name = sanitize(
+                format_assignments(args.screen_name or args.command, assignment)
+            )
+            print("Launching {}".format(screen_name))
+            # don't need the --sync since at this point it is guaranteed
+            config.launch_screen(
+                sys.argv
+                + [
+                    "--foreach-specified-args",
+                    json.dumps(assignment),
+                    "--when-done-set",
+                    output_file,
+                    token,
+                ],
+                screen_name,
+            )
+
+        dispatch_workers(args.max_workers, launch_worker, assignments)
         return
 
     for _, cmd_to_use, _ in commands:

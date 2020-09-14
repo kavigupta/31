@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="31",
-    version="1.3",
+    version="1.4",
     author="Kavi Gupta",
     author_email="31@kavigupta.org",
     description="Runs code in a specified environment in the background and notifies you when it is done.",
@@ -24,5 +24,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.5",
-    install_requires=["attrs>=20.1.0", "display-timedelta==1.1"],
+    install_requires=["attrs>=20.1.0", "display-timedelta==1.1", "filelock==3.0.12"],
 )
