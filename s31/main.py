@@ -102,27 +102,36 @@ def command_action(args):
         if args.foreach_specified_args is not None
         else parse_foreach_args(args)
     )
+    commands = []
     for assignment in assignments:
         screen_name = sanitize(
             format_assignments(args.screen_name or args.command, assignment)
         )
-        if args.sync or args.dry_run:
-            cmd = Command(cmd_line=args.command, location=args.location)
-            cmd_to_use = cmd.replace(assignment)
-            if args.dry_run:
-                if not args.sync:
-                    print("# on screen {}".format(screen_name))
-                cmd_to_use.dry_run()
-            elif args.no_email:
-                cmd_to_use.run()
-            else:
-                notify(config, cmd_to_use)
-        else:
+        cmd = Command(cmd_line=args.command, location=args.location)
+        cmd_to_use = cmd.replace(assignment)
+        commands.append((screen_name, cmd_to_use, assignment))
+
+    if args.dry_run:
+        for screen_name, cmd_to_use, _ in commands:
+            if not args.sync:
+                print("# on screen {}".format(screen_name))
+            cmd_to_use.dry_run()
+        return
+
+    if not args.sync:
+        for screen_name, _, assignment in commands:
             config.launch_screen(
                 sys.argv
                 + ["--sync", "--foreach-specified-args", json.dumps(assignment)],
                 screen_name,
             )
+        return
+
+    for _, cmd_to_use, _ in commands:
+        if args.no_email:
+            cmd_to_use.run()
+        else:
+            notify(config, cmd_to_use)
 
 
 def config_action(args):
