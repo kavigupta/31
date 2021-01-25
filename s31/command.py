@@ -27,7 +27,7 @@ class Command:
                 **self.kwargs
             )
             while p.poll() is None:
-                line = p.stdout.readline()
+                line = p.stdout.read(1)
                 if line:
                     write(line)
             while True:
