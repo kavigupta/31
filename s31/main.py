@@ -7,6 +7,7 @@ from .config import Config, update_config
 from .notify import notify
 from .command import Command
 from .foreach import MAX_FOREACHES, parse_foreach_args, parse_values
+from .interruptable_runner import InterruptableRunner
 from .utils import format_assignments, sanitize, set_key
 from .workers import dispatch_workers
 
@@ -205,11 +206,12 @@ def do_command_action(args):
         dispatch_workers(args.max_workers, launch_worker, assignments)
         return
 
-    for _, cmd_to_use, _ in commands:
+    for screen_name, cmd_to_use, _ in commands:
+        runner = InterruptableRunner(screen_name, os.getpid(), cmd_to_use)
         if args.no_email:
-            cmd_to_use.run()
+            runner.run_checking_interrupt(cmd_to_use.run)
         else:
-            notify(config, cmd_to_use)
+            notify(config, cmd_to_use, runner)
 
 
 def config_action(args):
