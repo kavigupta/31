@@ -8,6 +8,7 @@ from .notify import notify
 from .command import Command
 from .foreach import MAX_FOREACHES, parse_foreach_args, parse_values
 from .interruptable_runner import InterruptableRunner
+from .process_manager import list_procesess, stop_process
 from .utils import format_assignments, sanitize, set_key
 from .workers import dispatch_workers
 
@@ -116,6 +117,23 @@ def main():
     config_parser.add_argument("key", help="The configuration key to modify")
     config_parser.add_argument("value", help="The value to assign the given key to")
     config_parser.set_defaults(action=config_action)
+
+    list_parser = subparsers.add_parser("list", help="List all commands", aliases=["l"])
+    config_argument(list_parser)
+    list_parser.add_argument(
+        "-o",
+        "--ordering",
+        help="The ordering to use",
+        choices=["timestamp", "name"],
+        default="timestamp",
+    )
+    list_parser.set_defaults(action=list_action)
+
+    stop_parser = subparsers.add_parser("stop", help="Stop a command", aliases=["s"])
+    config_argument(stop_parser)
+    stop_parser.add_argument("name", help="The name of the command to stop")
+    stop_parser.set_defaults(action=stop_action)
+
     args = parser.parse_args()
 
     try:
@@ -216,3 +234,11 @@ def do_command_action(args):
 
 def config_action(args):
     update_config(args.config_file, {args.key: args.value})
+
+
+def list_action(args):
+    list_procesess(args.ordering)
+
+
+def stop_action(args):
+    stop_process(args.name)
