@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="31",
-    version="1.7",
+    version="1.8",
     author="Kavi Gupta",
     author_email="31@kavigupta.org",
     description="Runs code in a specified environment in the background and notifies you when it is done.",
