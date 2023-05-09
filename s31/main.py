@@ -121,6 +121,11 @@ def main():
     list_parser = subparsers.add_parser("list", help="List all commands", aliases=["l"])
     config_argument(list_parser)
     list_parser.add_argument(
+        "prefix",
+        help="Only list commands whose names start with the given prefix",
+        nargs="?",
+    )
+    list_parser.add_argument(
         "-o",
         "--ordering",
         help="The ordering to use",
@@ -132,6 +137,12 @@ def main():
     stop_parser = subparsers.add_parser("stop", help="Stop a command", aliases=["s"])
     config_argument(stop_parser)
     stop_parser.add_argument("name", help="The name of the command to stop")
+    stop_parser.add_argument(
+        "-m",
+        "--multi",
+        help="Stop all commands with the given prefix, even if there are multiple or it isn't the full name",
+        action="store_true",
+    )
     stop_parser.set_defaults(action=stop_action)
 
     args = parser.parse_args()
@@ -237,7 +248,7 @@ def config_action(args):
 
 
 def list_action(args):
-    list_procesess(args.ordering)
+    list_procesess(args.prefix, args.ordering)
 
 
 def stop_action(args):
