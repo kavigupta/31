@@ -36,10 +36,10 @@ def stop_process(name):
         return 1
     with_name_prefix = load_processes(name, "timestamp")
     if len(with_name_prefix) == 0:
-        print(f"No process with name {name} found")
+        print(f"No process with name {name!r} found")
         return 1
-    if len(with_name_prefix) > 1:
-        print(f"Multiple processes with prefix {name} found:")
+    if with_name_prefix != [name]:
+        print(f"Processes with prefix {name!r}:")
         for proc in with_name_prefix:
             print(render(proc))
         if input("Do you want to stop all of them? [y/N] ") != "y":
@@ -48,13 +48,7 @@ def stop_process(name):
         for proc in with_name_prefix:
             stop(proc)
         return 0
-    proc = with_name_prefix[0]
-    if proc["name"] != name:
-        print(
-            f"Process name {proc['name']} does not match {name}. Please type the full name."
-        )
-        return 1
-    stop(proc)
+    stop(name)
     return 0
 
 def stop(proc):
