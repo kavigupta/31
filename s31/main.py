@@ -1,4 +1,5 @@
 import argparse
+from collections import Counter
 import sys
 import os
 import json
@@ -190,6 +191,8 @@ def do_command_action(args):
         cmd_to_use = cmd.replace(assignment)
         commands.append((screen_name, cmd_to_use, assignment))
 
+    _check_screen_name_non_overlap(commands)
+
     if args.dry_run:
         for screen_name, cmd_to_use, _ in commands:
             if not args.sync:
@@ -241,6 +244,18 @@ def do_command_action(args):
             runner.run_checking_interrupt(cmd_to_use.run)
         else:
             notify(config, cmd_to_use, runner)
+
+
+def _check_screen_name_non_overlap(commands):
+    command_counts = Counter(name for name, _, _ in commands)
+    duplicates = [name for name, count in command_counts.items() if count > 1]
+    if not duplicates:
+        return
+    print("Screen names generated multiple times:", file=sys.stderr)
+    for name in duplicates:
+        print(f"  {name!r}", file=sys.stderr)
+    print("ERROR: Screen names must be unique", file=sys.stderr)
+    exit(1)
 
 
 def config_action(args):
