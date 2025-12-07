@@ -10,40 +10,40 @@ jobs:
       fail-fast: false
       matrix:
         name: [
-          Python 3.8 (Macintosh),
-          Python 3.8 (Ubuntu),
-          Python 3.7 (Macintosh),
-          Python 3.7 (Ubuntu),
-          Python 3.6 (Macintosh),
-          Python 3.6 (Ubuntu),
-          Python 3.5 (Macintosh),
-          Python 3.5 (Ubuntu),
+          Python 3.13 (Macintosh),
+          Python 3.13 (Ubuntu),
+          Python 3.12 (Macintosh),
+          Python 3.12 (Ubuntu),
+          Python 3.11 (Macintosh),
+          Python 3.11 (Ubuntu),
+          Python 3.10 (Macintosh),
+          Python 3.10 (Ubuntu),
         ]
         include:
-          - name: Python 3.8 (Macintosh)
+          - name: Python 3.13 (Macintosh)
             os: macos-latest
-            python-version: 3.8
-          - name: Python 3.8 (Ubuntu)
+            python-version: 3.13
+          - name: Python 3.13 (Ubuntu)
             os: ubuntu-latest
-            python-version: 3.8
-          - name: Python 3.7 (Macintosh)
+            python-version: 3.13
+          - name: Python 3.12 (Macintosh)
             os: macos-latest
-            python-version: 3.7
-          - name: Python 3.7 (Ubuntu)
+            python-version: 3.12
+          - name: Python 3.12 (Ubuntu)
             os: ubuntu-latest
-            python-version: 3.7
-          - name: Python 3.6 (Macintosh)
+            python-version: 3.12
+          - name: Python 3.11 (Macintosh)
             os: macos-latest
-            python-version: 3.6
-          - name: Python 3.6 (Ubuntu)
+            python-version: 3.11
+          - name: Python 3.11 (Ubuntu)
             os: ubuntu-latest
-            python-version: 3.6
-          - name: Python 3.5 (Macintosh)
+            python-version: 3.11
+          - name: Python 3.10 (Macintosh)
             os: macos-latest
-            python-version: 3.5
-          - name: Python 3.5 (Ubuntu)
+            python-version: 3.10
+          - name: Python 3.10 (Ubuntu)
             os: ubuntu-latest
-            python-version: 3.5
+            python-version: 3.10
     env:
       VENV_DIR: env
     steps:
@@ -52,14 +52,14 @@ jobs:
       with:
         fetch-depth: 1
     - name: "Caching (for Linux)"
-      uses: actions/cache@v1
+      uses: actions/cache@v4
       if: startsWith(runner.os, 'linux')
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: ${{ runner.os }}-pip-
     - name: "Caching (for Macintosh)"
-      uses: actions/cache@v1
+      uses: actions/cache@v4
       if: startsWith(runner.os, 'macos')
       with:
         path: ~/Library/Caches/pip
