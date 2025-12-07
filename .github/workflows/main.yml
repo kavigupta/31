@@ -90,4 +90,4 @@ jobs:
         esac
         . "${VENV_DIR}/${scripts}/activate"
         echo "Using $(python --version) on ${{ matrix.os }}" 1>&2
-        nosetests --with-coverage tests
+        pytest --cov=. --cov-report=term tests
