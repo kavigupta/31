@@ -6,7 +6,7 @@ from .utils import output_matches
 
 def get_mail_program(program_name):
     if program_name == "detect":
-        if output_matches("mail -V", "^mail \(GNU Mailutils\).*"):
+        if output_matches("mail -V", r"^mail \(GNU Mailutils\).*"):
             program_name = "gnu_mail"
         elif output_matches("mutt -h", "Mutt .*"):
             program_name = "mutt"
