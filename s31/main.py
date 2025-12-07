@@ -1,4 +1,5 @@
 import argparse
+from collections import Counter
 import sys
 import os
 import json
@@ -149,6 +150,8 @@ def main():
 
     try:
         args.action(args)
+    except SystemExit:
+        raise  # Re-raise SystemExit so it propagates properly
     except RuntimeError as e:
         print(e, file=sys.stderr)
 
@@ -156,6 +159,8 @@ def main():
 def command_action(args):
     try:
         return do_command_action(args)
+    except SystemExit:
+        raise  # Re-raise SystemExit so it propagates
     finally:
         if args.when_done_set is not None:
             set_key(*args.when_done_set)
@@ -189,6 +194,8 @@ def do_command_action(args):
         cmd = Command(cmd_line=args.command, location=args.location)
         cmd_to_use = cmd.replace(assignment)
         commands.append((screen_name, cmd_to_use, assignment))
+
+    _check_screen_name_non_overlap(commands)
 
     if args.dry_run:
         for screen_name, cmd_to_use, _ in commands:
@@ -241,6 +248,18 @@ def do_command_action(args):
             runner.run_checking_interrupt(cmd_to_use.run)
         else:
             notify(config, cmd_to_use, runner)
+
+
+def _check_screen_name_non_overlap(commands):
+    command_counts = Counter(name for name, _, _ in commands)
+    duplicates = [name for name, count in command_counts.items() if count > 1]
+    if not duplicates:
+        return
+    print("Screen names generated multiple times:", file=sys.stderr)
+    for name in duplicates:
+        print(f"  {name!r}", file=sys.stderr)
+    print("ERROR: Screen names must be unique", file=sys.stderr)
+    raise SystemExit(1)
 
 
 def config_action(args):
