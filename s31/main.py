@@ -150,6 +150,8 @@ def main():
 
     try:
         args.action(args)
+    except SystemExit:
+        raise  # Re-raise SystemExit so it propagates properly
     except RuntimeError as e:
         print(e, file=sys.stderr)
 
@@ -157,6 +159,8 @@ def main():
 def command_action(args):
     try:
         return do_command_action(args)
+    except SystemExit:
+        raise  # Re-raise SystemExit so it propagates
     finally:
         if args.when_done_set is not None:
             set_key(*args.when_done_set)
@@ -255,7 +259,7 @@ def _check_screen_name_non_overlap(commands):
     for name in duplicates:
         print(f"  {name!r}", file=sys.stderr)
     print("ERROR: Screen names must be unique", file=sys.stderr)
-    exit(1)
+    raise SystemExit(1)
 
 
 def config_action(args):
